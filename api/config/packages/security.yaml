@@ -49,6 +49,13 @@ security:
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
 
+    role_hierarchy:
+        ROLE_TENANT:
+        ROLE_HOMEOWNER:
+        ROLE_AGENCY: [ ROLE_TENANT, ROLE_HOMEOWNER ]
+        ROLE_ADMIN: [ ROLE_AGENCY, ROLE_TENANT, ROLE_HOMEOWNER ]
+        ROLE_SUPER_ADMIN: [ ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH ]
+
 when@test:
     security:
         password_hashers:
