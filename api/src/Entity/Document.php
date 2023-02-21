@@ -64,6 +64,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     denormalizationContext: ['groups' => ['document_write']]
 )]
 #[ApiFilter(SearchFilter::class, properties: ['user_document' => 'exact'])]
+#[Put(security: "is_granted('ROLE_AGENCY') or object.getUserDocument() == user")]
 #[Vich\Uploadable]
 #[ORM\Entity]
 class Document

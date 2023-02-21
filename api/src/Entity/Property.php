@@ -31,7 +31,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     normalizationContext: ['groups' => ['property_read', 'all',]],
     denormalizationContext: ['groups' => ['property_write']],
 )]
-#[Post]
+#[Post(security: "is_granted('ROLE_HOMEOWNER')")]
 #[Put(security: "is_granted('ROLE_AGENCY') or object.getOwner() == user")]
 #[ORM\Entity(repositoryClass: PropertyRepository::class)]
 class Property implements PropertyInterface

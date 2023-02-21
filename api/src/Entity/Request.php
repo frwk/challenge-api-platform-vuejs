@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
 use App\Helpers\DateFormatterHelper;
 use App\Repository\RequestRepository;
 use App\Traits\EntityIdTrait;
@@ -16,6 +18,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
     normalizationContext: ['groups' => ['request_read', 'all', 'all_timestamp', 'property_read']],
     denormalizationContext: ['groups' => ['request_write']]
 )]
+#[Get]
+#[Get(routeName: 'get_requests_by_owner')]
+#[Get(routeName: 'get_requests_by_lodger')]
+#[Post(routeName: 'post_requests_slots')]
+#[Post(routeName: 'post_requests_slot')]
+#[Get(routeName: 'get_requests_slots')]
+
 #[ORM\Entity(repositoryClass: RequestRepository::class)]
 class Request
 {
