@@ -8,8 +8,10 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Controller\PropertyController;
+use App\Dto\PropertyOutput;
 use App\Interfaces\PropertyInterface;
 use App\Repository\PropertyRepository;
+use App\State\PropertyOutputProvider;
 use App\Traits\EntityIdTrait;
 use App\Traits\TimestampTrait;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -19,20 +21,44 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ApiResource(
+//#[ApiResource(
+//    normalizationContext: ['groups' => ['property_read', 'all',]],
+//    denormalizationContext: ['groups' => ['property_write']],
+//)]
+//#[Get]
+#[Get(
     normalizationContext: ['groups' => ['property_read', 'all',]],
     denormalizationContext: ['groups' => ['property_write']],
+    security: "is_granted('".User::ROLE_HOMEOWNER."')",
 )]
-#[Get]
-#[GetCollection]
+#[Get(
+    uriTemplate: '/property_details/by_tenant/{id}',
+    security: "is_granted('".User::ROLE_TENANT."')",
+    output: PropertyOutput::class,
+    provider: PropertyOutputProvider::class
+)]
+
+#[GetCollection(
+    normalizationContext: ['groups' => ['property_read', 'all',]],
+    denormalizationContext: ['groups' => ['property_write']],
+    security: "is_granted('".User::ROLE_HOMEOWNER."')",
+)]
 #[GetCollection(
     uriTemplate: '/property/by_tenant',
     controller: PropertyController::class,
     normalizationContext: ['groups' => ['property_read', 'all',]],
-    denormalizationContext: ['groups' => ['property_write']],
+    denormalizationContext: ['groups' => ['property_write']]
 )]
-#[Post(security: "is_granted('ROLE_HOMEOWNER')")]
-#[Put(security: "is_granted('ROLE_AGENCY') or object.getOwner() == user")]
+#[Post(
+    normalizationContext: ['groups' => ['property_read', 'all',]],
+    denormalizationContext: ['groups' => ['property_write']],
+    security: "is_granted('".User::ROLE_HOMEOWNER."')"
+)]
+#[Put(
+    normalizationContext: ['groups' => ['property_read', 'all',]],
+    denormalizationContext: ['groups' => ['property_write']],
+    security: "is_granted('".User::ROLE_AGENCY."') or object.getOwner() == user"
+)]
 #[ORM\Entity(repositoryClass: PropertyRepository::class)]
 class Property implements PropertyInterface
 {
@@ -130,6 +156,25 @@ class Property implements PropertyInterface
     #[ORM\OneToMany(mappedBy: 'property', targetEntity: MediaObject::class)]
     #[Groups(['property_read', 'property_write'])]
     private Collection $photos;
+
+    #[Groups(['property_read', 'property_write'])]
+    private ?array $photosUrl = null;
+
+    /**
+     * @return array|null
+     */
+    public function getPhotosUrl(): ?array
+    {
+        return $this->photosUrl;
+    }
+
+    /**
+     * @param array|null $photosUrl
+     */
+    public function setPhotosUrl(?array $photosUrl): void
+    {
+        $this->photosUrl = $photosUrl;
+    }
 
     public function __construct()
     {

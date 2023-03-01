@@ -5,6 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
+use App\Controller\CreateRequestAction;
 use App\Helpers\DateFormatterHelper;
 use App\Repository\RequestRepository;
 use App\Traits\EntityIdTrait;
@@ -19,6 +20,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
     denormalizationContext: ['groups' => ['request_write']]
 )]
 #[Get]
+#[Post]
+#[Post(
+    uriTemplate: '/property_request/by_tenant',
+    controller: CreateRequestAction::class,
+    denormalizationContext: ['groups' => ['property_request_write']],
+    security: "is_granted('".User::ROLE_TENANT."')"
+)]
 #[Get(routeName: 'get_requests_by_owner')]
 #[Get(routeName: 'get_requests_by_lodger')]
 #[Post(routeName: 'post_requests_slots')]
@@ -36,10 +44,10 @@ class Request
     private ?User $lodger = null;
 
     #[ORM\ManyToOne(inversedBy: 'requests')]
-    #[Groups(['request_read', 'request_write', 'viewing_read'])]
+    #[Groups(['request_read', 'request_write', 'viewing_read', 'property_request_write'])]
     private ?Property $property = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255, nullable: true, options: ["default" => "pending"])]
     #[Groups(['request_read', 'request_write', 'property_read'])]
     private ?string $state = null;
 

@@ -53,6 +53,10 @@ services:
         tags:
             - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_created, method: onJWTCreated }
 
+    App\State\PropertyOutputProvider:
+        bind:
+            $itemProvider : '@api_platform.doctrine.orm.state.item_provider'
+
     'App\Serializer\UserNormalizer':
         arguments: [ '@security.token_storage' ]
         tags:
