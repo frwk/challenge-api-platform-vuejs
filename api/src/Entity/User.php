@@ -33,13 +33,14 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new GetCollection(),
         new Post(processor: UserPasswordHasher::class),
-        new Get(),
+//        new Get(),
         new Get(
             uriTemplate: '/user/details',
             controller: UserController::class,
-            output: false,
+            normalizationContext: ['groups' => ['user_read', 'all']],
+            denormalizationContext: ['groups' => ['user_write']],
             read: false,
-            name: 'user_account'
+            name: 'user_account',
         ),
         new Put(processor: UserPasswordHasher::class),
         new Patch(processor: UserPasswordHasher::class),
